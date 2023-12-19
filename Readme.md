@@ -1,0 +1,10 @@
+# An Extended SIR Mathematical Model for Lumpy Skin Disease and Associated Properties
+
+This report presents an extended Susceptible-Exposed-Infectious-Treated-Recovered (SEITR) mathematical
+model designed to analyze the transmission dynamics of the Lumpy Skin Disease (LSD) virus in cattle popula-
+tions. The model incorporates key aspects of LSD epidemiology and leverages network theory to represent the
+complex interactions within the cattle population. The report discusses the model’s formulation, fundamental
+properties, implementation, and experimental results. It also outlines potential avenues for future research.
+
+## Introduction
+Lumpy Skin Disease (LSD) is a severe disease that affects cattle, causing significant economic losses due to decreased milk production, weight loss, and damage to hides. The disease is caused by the LSD virus, which is primarily transmitted by blood-feeding insects. Understanding the transmission dynamics of the LSD virus is crucial for developing effective control and prevention strategies. To achieve this goal, mathematical modeling has emerged as a powerful tool. In particular, the Susceptible-Exposed-Infectious-Treated-Recovered (SEITR) model, an extension of the classic SIR model, has been widely used to study various diseases. The SEITR model incorporates an exposed stage, representing individuals who have been infected but are not yet infectious, and a treated stage, representing individuals who have been infected and are receiving treatment. In this report, we present an extended SEITR model designed to analyze the transmission dynamics of the LSD virus in cattle populations. Our model incorporates key aspects of LSD epidemiology, including the exposed and treated stages of the disease. Furthermore, our model leverages network theory to represent the complex interactions within the cattle population, which are crucial for understanding the spread of the LSD virus.
