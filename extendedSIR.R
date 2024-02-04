@@ -425,14 +425,13 @@ network_colors <- c("S" = "gray", "E" = "orange", "I" = "red", "Tt" = "green", "
 # Plot
 ggplot(df_long, aes(x = time, y = count)) +
   geom_line(data = df_long[df_long$type == "ODE", ], aes(color = type)) +
-  geom_line(data = df_long[df_long$type == "Network", ], aes(color = status), size = 1.1) +
+  geom_line(data = df_long[df_long$type == "Network", ], aes(color = status), linewidth = 1.1) +
   geom_point(data = peaks, aes(fill = type, color = NULL), size = 3, shape = 21) +
   geom_text(data = peaks, aes(label = label), vjust = -1) +
   scale_color_manual(values = c("ODE" = "black", network_colors)) +
   scale_fill_manual(values = c("ODE" = "white", "Network" = network_colors), guide = FALSE) +
-  labs(x = "Time (Days)", y = "Count") +
+  labs(x = "Time", y = "Count") +
   facet_wrap(~ factor(status, levels = c("S", "E", "I", "Tt", "R", "N")), scales = "free_y", ncol = 2) +
   theme_minimal() +
-  theme(legend.position = "bottom") +
   expand_limits(y = max(df_long$count) * .4) # Expand y-axis limits
 
