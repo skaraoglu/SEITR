@@ -389,6 +389,7 @@ ws_p.5_k20 <- SEITR_network("WS", n_par1=0.5, n_par2=20, num_exp = 3)
 ws_p.9_k20 <- SEITR_network("WS", n_par1=0.9, n_par2=20, num_exp = 3)
 
 compare_experiment_sets <- function(experiment_sets_list) {
+  experiment_names <- sapply(as.list(substitute(experiment_sets_list))[-1], deparse)
   par(mfrow = c(1, 1))
   statuses <- c("S", "E", "I", "Tt", "R", "N")
   colors <- rainbow(length(experiment_sets_list))
@@ -409,8 +410,8 @@ compare_experiment_sets <- function(experiment_sets_list) {
       text(times[lowest_peak], avg_values[lowest_peak], labels = paste("(", round(times[lowest_peak], 1), ", ", round(avg_values[lowest_peak], 1), ")", sep = ""), pos = 3, col = "black")
       cnt <- cnt + 1
     }
+    legend("topright", legend = c("ODE", experiment_names), fill = c("black", colors), bty = "n")
   }
 }
-
 
 compare_experiment_sets(list(ws_p.1_k20, ws_p.3_k20, ws_p.5_k20, ws_p.9_k20))
