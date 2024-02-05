@@ -410,7 +410,7 @@ compare_experiment_sets <- function(experiment_sets_list) {
       text(times[lowest_peak], avg_values[lowest_peak], labels = paste("(", round(times[lowest_peak], 1), ", ", round(avg_values[lowest_peak], 1), ")", sep = ""), pos = 3, col = "black")
       cnt <- cnt + 1
     }
-    legend("topright", legend = c("ODE", experiment_names), fill = c("black", colors), bty = "n")
+    legend("bottomleft", legend = c("ODE", experiment_names), fill = c("black", colors), bty = "n")
   }
 }
 
