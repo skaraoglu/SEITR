@@ -46,6 +46,12 @@ SEITR_network <- function(network_type="ER", n=100, n_par1=.9, n_par2=10,
       init_p <- n_par1
       k <- n_par2
       g <- sample_smallworld(dim = 1, size = N, nei = k, p = init_p)
+    } else if (network_type == "LN"){
+      k <- n_par1  # The number of nearest neighbors in ring topology
+      g <- make_lattice(length = N, dim = 1, nei = k, directed = FALSE, mutual = TRUE, circular = TRUE)
+    } else if (network_type == "RR"){
+      k <- n_par1  # The number of edges to attach from each new node to existing nodes
+      g <- sample_k_regular(no.of.nodes = N, k = n_par1, directed = FALSE)
     }
     
     status_counts <- list()
@@ -72,8 +78,8 @@ SEITR_network <- function(network_type="ER", n=100, n_par1=.9, n_par2=10,
       par(mfrow = c(1, 1))  # Set up a 1x1 grid for the plot
       plot(g, vertex.color = status_colors[V(g)$status], vertex.label = V(g)$label, vertex.size=10)
       title(paste("Initial Network"))
-      status_counts <- table(V(g)$status)
-      status_labels <- paste(names(status_colors), " (", status_counts[names(status_colors)], ")", sep = "")
+      status_counts_plot <- table(V(g)$status)
+      status_labels <- paste(names(status_colors), " (", status_counts_plot[names(status_colors)], ")", sep = "")
       legend("bottomright", legend = status_labels, fill = status_colors, title = "Status")
     }
     node_counter <- vcount(g)  # The current number of nodes in the graph
@@ -178,6 +184,14 @@ SEITR_network <- function(network_type="ER", n=100, n_par1=.9, n_par2=10,
                 g <- add_edges(g, c(vcount(g), new_neighbor))
               }
             }
+          } else if(network_type == "LN"){
+            # For a lattice, connect the new node to its k nearest neighbors
+            nodes_to_attach <- c((vcount(g) - n_par1 + 1):vcount(g))
+            nodes_to_attach <- nodes_to_attach[nodes_to_attach > 0 & nodes_to_attach < vcount(g)]
+            g <- add_edges(g, c(rbind(rep(vcount(g), length(nodes_to_attach)), nodes_to_attach)))
+          } else if (network_type == "RR"){
+            nodes_to_attach <- sample(V(g)[-vcount(g)], size = n_par1)
+            g <- add_edges(g, c(rbind(rep(vcount(g), length(nodes_to_attach)), nodes_to_attach)))
           }
           if(verbose){cat("Time", t, ": New node", new_label, "added with status", new_status, "\n")}
         }
@@ -221,6 +235,14 @@ SEITR_network <- function(network_type="ER", n=100, n_par1=.9, n_par2=10,
                 g <- add_edges(g, c(vcount(g), new_neighbor))
               }
             }
+          } else if(network_type == "LN"){
+            # For a lattice, connect the new node to its k nearest neighbors
+            nodes_to_attach <- c((vcount(g) - n_par1 + 1):vcount(g))
+            nodes_to_attach <- nodes_to_attach[nodes_to_attach > 0 & nodes_to_attach < vcount(g)]
+            g <- add_edges(g, c(rbind(rep(vcount(g), length(nodes_to_attach)), nodes_to_attach)))
+          } else if (network_type == "RR"){
+            nodes_to_attach <- sample(V(g)[-vcount(g)], size = n_par1)
+            g <- add_edges(g, c(rbind(rep(vcount(g), length(nodes_to_attach)), nodes_to_attach)))
           }
           if(verbose){cat("Time", t, ": New node", new_label, "added with status", new_status, "\n")}
         }
@@ -269,26 +291,26 @@ SEITR_network <- function(network_type="ER", n=100, n_par1=.9, n_par2=10,
       if (t %% 10 == 0 && verbose) {
         plot(g, vertex.color = status_colors[V(g)$status], vertex.size=10, vertex.label=V(g)$label)
         title(paste("Time Step:", t))
-        status_counts <- table(V(g)$status)
-        status_labels <- paste(names(status_colors), " (", status_counts[names(status_colors)], ")", sep = "")
+        status_counts_plot <- table(V(g)$status)
+        status_labels <- paste(names(status_colors), " (", status_counts_plot[names(status_colors)], ")", sep = "")
         legend("bottomright", legend = status_labels, fill = status_colors, title = "Status")
       }
     }
     
     if(verbose){
-      par(mfrow = c(3, 2))
-      plot(out[, "time"], out[, "S"], type = "l", col = status_colors["S"], xlab = "Time (Days)", ylab = "Susceptibles", main = "Comparison of Susceptibles")
-      lines(times, S_count, col = status_colors["S"])
-      plot(out[, "time"], out[, "E"], type = "l", col = "orange", xlab = "Time (Days)", ylab = "Exposed", main = "Comparison of Exposed")
-      lines(times, E_count, col = "orange")
-      plot(out[, "time"], out[, "I"], type = "l", col = status_colors["I"], xlab = "Time (Days)", ylab = "Infected", main = "Comparison of Infected")
-      lines(times, I_count, col = status_colors["I"])
-      plot(out[, "time"], out[, "Tt"], type = "l", col = status_colors["Tt"], xlab = "Time (Days)", ylab = "Treatment", main = "Comparison of Treatment")
-      lines(times, Tt_count, col = status_colors["Tt"])
-      plot(out[, "time"], out[, "R"], type = "l", col = status_colors["R"], xlab = "Time (Days)", ylab = "Recovered", main = "Comparison of Recovered")
-      lines(times, R_count, col = status_colors["R"])
-      plot(out[, "time"], out[, "N"], type = "l", col = "blue", xlab = "Time (Days)", ylab = "Total Population", main = "Comparison of Total Population")
-      lines(times, N_count, col = "blue")
+      #par(mfrow = c(3, 2))
+      #plot(out[, "time"], out[, "S"], type = "l", col = status_colors["S"], xlab = "Time (Days)", ylab = "Susceptibles", main = "Comparison of Susceptibles")
+      #lines(times, S_count, col = status_colors["S"])
+      #plot(out[, "time"], out[, "E"], type = "l", col = "orange", xlab = "Time (Days)", ylab = "Exposed", main = "Comparison of Exposed")
+      #lines(times, E_count, col = "orange")
+      #plot(out[, "time"], out[, "I"], type = "l", col = status_colors["I"], xlab = "Time (Days)", ylab = "Infected", main = "Comparison of Infected")
+      #lines(times, I_count, col = status_colors["I"])
+      #plot(out[, "time"], out[, "Tt"], type = "l", col = status_colors["Tt"], xlab = "Time (Days)", ylab = "Treatment", main = "Comparison of Treatment")
+      #lines(times, Tt_count, col = status_colors["Tt"])
+      #plot(out[, "time"], out[, "R"], type = "l", col = status_colors["R"], xlab = "Time (Days)", ylab = "Recovered", main = "Comparison of Recovered")
+      #lines(times, R_count, col = status_colors["R"])
+      #plot(out[, "time"], out[, "N"], type = "l", col = "blue", xlab = "Time (Days)", ylab = "Total Population", main = "Comparison of Total Population")
+      #lines(times, N_count, col = "blue")
     
     
       par(mfrow = c(2, 2))
@@ -396,7 +418,7 @@ compare_experiment_sets <- function(experiment_sets_list) {
   times <- seq(0, 100, by = 1)
   for (j in 1:length(statuses)) {
     y_range <- range(c(out[-nrow(out), statuses[j]]))  # Exclude the last row
-    plot(out[-nrow(out), "time"], out[-nrow(out), statuses[j]], type = "n", xlab = "Time", ylab = statuses[j], main = paste("Comparison of", statuses[j]), ylim = y_range + c(-y_margin, y_margin))  # Exclude the last row
+    plot(out[-nrow(out), "time"], out[-nrow(out), statuses[j]], type = "n", xlab = "Time", ylab = statuses[j], main = paste("Comparison of", statuses[j]), ylim = y_range + c(-5, 5))  # Exclude the last row
     lines(times[-length(times)], out[-nrow(out), statuses[j]], col = "black", lwd = 2)
     cnt <- 1
     for (experiment_set in experiment_sets_list) {
@@ -410,8 +432,14 @@ compare_experiment_sets <- function(experiment_sets_list) {
       text(times[lowest_peak], avg_values[lowest_peak], labels = paste("(", round(times[lowest_peak], 1), ", ", round(avg_values[lowest_peak], 1), ")", sep = ""), pos = 3, col = "black")
       cnt <- cnt + 1
     }
-    legend("bottomleft", legend = c("ODE", experiment_names), fill = c("black", colors), bty = "n")
+    if(j == 5){legend("bottomright", legend = c("ODE", experiment_names), fill = c("black", colors), bty = "n")}
+    else{legend("topright", legend = c("ODE", experiment_names), fill = c("black", colors), bty = "n")}
   }
 }
 
 compare_experiment_sets(list(ws_p.1_k20, ws_p.3_k20, ws_p.5_k20, ws_p.9_k20))
+
+ln_k3 <- SEITR_network("LN", n_par1 = 3, num_exp = 3, verbose = T)
+rr_k3 <- SEITR_network("RR", n_par1 = 3, num_exp = 3, verbose = T)
+er_p.3 <- SEITR_network("ER", n_par1 = .3, num_exp = 3)
+compare_experiment_sets(list(ln_k3,rr_k3, er_p.3))
